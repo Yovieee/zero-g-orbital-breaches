@@ -1,0 +1,13 @@
+{
+  "name": "zero-g-orbital-breaches",
+  "version": "1.0.0",
+  "description": "Zero-Gravity Orbital Breaches — 5v5 Tactical Zero-G FPS built with Three.js and WebSockets",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "license": "MIT"
+}
