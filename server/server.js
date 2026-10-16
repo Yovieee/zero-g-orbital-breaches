@@ -11,7 +11,7 @@ const { WebSocketServer } = require('ws');
 const PORT = process.env.PORT || 8080;
 
 const server = http.createServer((req, res) => {
-  const safeUrl = req.url === '/' ? '/index.html' : req.url.split('?')[0];
+  const safeUrl = req.url === '/' ? '/index.html' : req.url;
   const filePath = path.join(__dirname, '..', safeUrl);
   fs.readFile(filePath, (err, content) => {
     if (err) {
@@ -41,15 +41,17 @@ const roomState = {
 
 wss.on('connection', (ws) => {
   const clientId = 'op-' + Math.random().toString(36).substring(2, 7);
-  clients.set(ws, { id: clientId, pos: [0, 1.75, 0], team: 'ATK' });
+  clients.set(ws, { id: clientId, pos: [0, 1.75, 0], team: 'ATK', surfaceNormal: [0, 1, 0], magBoots: true });
 
   ws.send(JSON.stringify({ type: 'WELCOME', clientId, roomState }));
 
   ws.on('message', (raw) => {
     try {
       const msg = JSON.parse(raw.toString());
-      if (msg.type === 'VIEWPORT_BREACH' && msg.vpId && !roomState.breachedViewports.includes(msg.vpId)) {
-        roomState.breachedViewports.push(msg.vpId);
+      if (msg.type === 'VIEWPORT_BREACH' && msg.vpId) {
+        if (!roomState.breachedViewports.includes(msg.vpId)) {
+          roomState.breachedViewports.push(msg.vpId);
+        }
       }
       for (const [peerWs] of clients) {
         if (peerWs !== ws && peerWs.readyState === 1) {

@@ -1,5 +1,5 @@
 /**
- * Phase 5 Hybrid Multiplayer Client (Authoritative WebSocket + BroadcastChannel P2P)
+ * Phase 5: Hybrid 60Hz Multiplayer Networking (WebSocket + BroadcastChannel P2P)
  */
 export class MultiplayerClient {
   constructor(localId, onPacket) {
@@ -20,15 +20,19 @@ export class MultiplayerClient {
     this.ws = new WebSocket(url);
     this.ws.onmessage = (ev) => {
       try {
-        const packet = JSON.parse(ev.data);
-        if (packet.senderId !== this.localId) this.onPacket(packet);
+        const data = JSON.parse(ev.data);
+        if (data.senderId !== this.localId) this.onPacket(data);
       } catch (e) {}
     };
   }
 
   broadcast(payload) {
     const packet = Object.assign({ senderId: this.localId, ts: Date.now() }, payload);
-    if (this.bc) this.bc.postMessage(packet);
-    if (this.ws && this.ws.readyState === 1) this.ws.send(JSON.stringify(packet));
+    if (this.bc) {
+      try { this.bc.postMessage(packet); } catch (e) {}
+    }
+    if (this.ws && this.ws.readyState === 1) {
+      try { this.ws.send(JSON.stringify(packet)); } catch (e) {}
+    }
   }
 }
