@@ -11,7 +11,8 @@ const { WebSocketServer } = require('ws');
 const PORT = process.env.PORT || 8080;
 
 const server = http.createServer((req, res) => {
-  const filePath = req.url === '/' ? path.join(__dirname, '..', 'index.html') : path.join(__dirname, '..', req.url);
+  const safeUrl = req.url === '/' ? '/index.html' : req.url.split('?')[0];
+  const filePath = path.join(__dirname, '..', safeUrl);
   fs.readFile(filePath, (err, content) => {
     if (err) {
       res.writeHead(404);
@@ -47,6 +48,9 @@ wss.on('connection', (ws) => {
   ws.on('message', (raw) => {
     try {
       const msg = JSON.parse(raw.toString());
+      if (msg.type === 'VIEWPORT_BREACH' && msg.vpId && !roomState.breachedViewports.includes(msg.vpId)) {
+        roomState.breachedViewports.push(msg.vpId);
+      }
       for (const [peerWs] of clients) {
         if (peerWs !== ws && peerWs.readyState === 1) {
           peerWs.send(JSON.stringify(msg));

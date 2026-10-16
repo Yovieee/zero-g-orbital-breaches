@@ -1,5 +1,5 @@
 /**
- * Phase 4 Station Alpha 3-Lane Map & Volumetric Foam / Breach Manager
+ * Phase 4 Station Alpha 3-Lane Orbital Map & Room-Graph Decompression System
  */
 export const SECTORS = [
   { id: 'DOCK', name: 'BREACHER DOCK', bounds: { minX: -36, maxX: -16, minZ: -14, maxZ: 14 }, default1G: false },
